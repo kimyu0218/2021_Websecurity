@@ -10,23 +10,31 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-
 app.run(host='0.0.0.0', debug = True)
 
-@app.route('/pdf_parsing', methods=['POST'])
+@app.route('/pdf_parsing', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
+        print(request.form)
+        print(request.files.getlist("Files"))
+        print(request.files)
+        print(request.files["Files"])
         files = request.form
-        for file in files:
-            print('--')
-            print(file)
-        print(files.to_dict(flat=False))
-        for file in files.to_dict(flat=False)['files']:
+        for file in files.to_dict(flat=False)['Files']:
             file.save('/var/www/html/files/'+secure_filename(file.filename))
 
-        os.system("ls -d /var/www/html/files/* > ~/pdfs.txt && cd ~/hidost/build/ && ./src/cacher -i ~/pdfs.txt --compact --values -c cache/ -t10 -m256 && find cache -name '*.pdf' -not -empty > cached-pdfs.txt && ./src/pathcount -i cached-pdfs.txt -o pathcounts.bin && ./src/feat-select -i pathcounts.bin -o features.nppf -m1000 && ./src/feat-extract cached-pdfs.txt -f features.nppf --values -o data.libsvm")
-
-        f = open("./feature_count.txt", "r")
+        os.system("""ls -d /var/www/html/files/* > ~/hidost/build/tpdfs.txt &&
+                    cd ~/hidost/build/ && 
+                    ./src/cacher -i tpdfs.txt --compact --values -c cache/ -t10 -m256 && 
+                    find cache -name '*.pdf' -not -empty > cached-tpdfs.txt &&
+                    cat cached-bpdfs.txt cached-mpdfs.txt cached-tpdfs.txt > cached-pdfs.txt &&
+                    cat cached-bpdfs.txt cached-tpdfs.txt > cached_benign_test.txt &&
+                    ./src/pathcount -i cached-pdfs.txt -o pathcounts.bin && 
+                    ./src/feat-select -i pathcounts.bin -o features.nppf -m1000 && 
+                    ./src/feat-extract -b cached_benign_test.txt -m cached-mpdfs.txt -f features.nppf --values -o data.libsvm &&
+                    cat features.nppf | wc -l > ~/feature_count.txt &&
+                    ls /var/www/html/files/* | wc -l > ~/upload_count.txt""")
+        f = open("~/feature_count.txt", "r")
         feature_line = int(f.read())
         f.close()
 
@@ -56,7 +64,34 @@ def upload_file():
         input_f.close()
         output_f.close()
 
-        return "string"
+        data = pd.read_csv("./output.csv", header=None, error_bad_lines=False)
+
+        data = data.drop(data.columns[-1], axis=1) # 필요 없는 데이터 제거 (파일의 맨 마지막에 파일 경로 저장)
+        data_drop = data.drop(0, axis=1) # 파일 라벨 제거
+        Y = data[0] # 0번째 컬럼에 라벨 저장되어 있음
+
+        datas = pd.DataFrame(data_drop.iloc[:,0:])
+        datas.columns = data_drop.iloc[:,0:].columns
+
+        X = datas.values
+
+        f = open("~/upload_count.txt", "r")
+        upload_count = int(f.read())
+        f.close()
+
+        x_train, x_test, y_train, y_test = train_test_split(X,Y,test_size=upload_count/len(X),random_state=0)
+        y_train = y_train.to_numpy()
+        y_test = y_test.to_numpy() 
+
+        rfc = RandomForestClassifier(random_state=0)
+        rfc.fit(x_train, y_train)
+
+        predict = rfc.predict(x_test)
+        score = accuracy_score(y_test, predict)
+        print("Acc: " + str(score))
+        print("Predict: " + str(predict))
+
+        return predict.tolist()
 
 
 @app.route('/load_model')
@@ -72,7 +107,7 @@ def load_model():
 
     X = datas.values
 
-    f = open("./upload_count.txt", "r")
+    f = open("~/upload_count.txt", "r")
     upload_count = int(f.read())
     f.close()
 
