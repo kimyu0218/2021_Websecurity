@@ -22,7 +22,7 @@ def upload_file():
         filenames = []
         for file in files.to_dict(flat=False)['file']:
             filenames.append(file.filename)
-            file.save('/'+secure_filename(file.filename))
+            file.save('/var/www/html/files/'+secure_filename(file.filename))
         
         os.system("""sudo ls -d /var/www/html/files/* > ~/hidost/build/tpdfs.txt &&
                     cd ~/hidost/build/ && 
