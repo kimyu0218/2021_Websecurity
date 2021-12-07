@@ -17,7 +17,7 @@ def upload_file():
     if request.method == 'POST':
         files = request.files
         for file in files.to_dict(flat=False)['file']:
-            file.save('./'+secure_filename(file.filename))
+            file.save('/var/www/html/files/'+secure_filename(file.filename))
 
         os.system("""ls -d /var/www/html/files/* > ~/hidost/build/tpdfs.txt &&
                     cd ~/hidost/build/ && 
@@ -88,35 +88,3 @@ def upload_file():
         print("Predict: " + str(predict))
 
         return predict.tolist()
-
-
-@app.route('/load_model')
-def load_model():
-    data = pd.read_csv("./output.csv", header=None, error_bad_lines=False)
-
-    data = data.drop(data.columns[-1], axis=1) # 필요 없는 데이터 제거 (파일의 맨 마지막에 파일 경로 저장)
-    data_drop = data.drop(0, axis=1) # 파일 라벨 제거
-    Y = data[0] # 0번째 컬럼에 라벨 저장되어 있음
-
-    datas = pd.DataFrame(data_drop.iloc[:,0:])
-    datas.columns = data_drop.iloc[:,0:].columns
-
-    X = datas.values
-
-    f = open("~/upload_count.txt", "r")
-    upload_count = int(f.read())
-    f.close()
-
-    x_train, x_test, y_train, y_test = train_test_split(X,Y,test_size=upload_count/len(X),random_state=0)
-    y_train = y_train.to_numpy()
-    y_test = y_test.to_numpy() 
-
-    rfc = RandomForestClassifier(random_state=0)
-    rfc.fit(x_train, y_train)
-
-    predict = rfc.predict(x_test)
-    score = accuracy_score(y_test, predict)
-    print("Acc: " + str(score))
-    print("Predict: " + str(predict))
-
-    return predict.tolist()
