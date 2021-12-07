@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request
+from flask import Flask, request, render_template
 from werkzeug.utils import secure_filename
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -12,13 +12,19 @@ CORS(app)
 
 app.run(host='0.0.0.0', debug = True)
 
+@app.route("/")
+def main():
+    return render_template('index.html')
+
 @app.route('/pdf_parsing', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
         files = request.files
+        filenames = []
         for file in files.to_dict(flat=False)['file']:
+            filenames.append(file.filename)
             file.save('/var/www/html/files/'+secure_filename(file.filename))
-
+        
         os.system("""ls -d /var/www/html/files/* > ~/hidost/build/tpdfs.txt &&
                     cd ~/hidost/build/ && 
                     ./src/cacher -i tpdfs.txt --compact --values -c cache/ -t10 -m256 && 
@@ -87,4 +93,4 @@ def upload_file():
         print("Acc: " + str(score))
         print("Predict: " + str(predict))
 
-        return predict.tolist()
+        return render_template('result.html', value=predict.tolist(), files=filenames)

@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="./index.css" />
+  </head>
+  <body>
+    <div id="container">
+      <label id="label">PDF Upload</label>
+        <div style="text-align: center">
+          <h4>======== File List ========</h4>
+          <div id="filelist">
+            <div style="width: 40%; float: left;">
+            <table>
+              {% for value in result %}
+              <tr>
+                {{value}} 
+              </tr>
+              <br>
+              {% endfor %}
+            </table>
+          </div>
+          <div style="width: 55%; float: right;">
+          <table>
+            {% for file in files %}
+            
+          <tr>{{file}} </tr>
+            <br>
+            {% endfor %}
+            </table>
+          </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
