@@ -4,17 +4,46 @@
   </head>
   <body>
     <div id="container">
-      <label id="label">PDF Upload</label>
+      <label id="label" for="input-file">PDF Upload</label>
       <form
         action="http://127.0.0.1:5000/pdf_parsing"
         method="POST"
         enctype="multipart/form-data"
       >
-        <input type="file" name="file" multiple />
+        <input
+          type="file"
+          name="file"
+          multiple
+          id="input-file"
+          style="display: none"
+        />
         <div style="text-align: center">
+          <h4>======== File List ========</h4>
+          <div id="filelist">
+            <p id="text">empty</p>
+          </div>
           <input type="submit" id="button" />
         </div>
       </form>
+      <script>
+        function preupload(input) {
+          const filelist = document.getElementById("filelist");
+
+          if (input.files) {
+            const text = document.getElementById("text");
+            text.innerHTML = "";
+            const fileArr = Array.from(input.files);
+            fileArr.forEach((file, index) => {
+              text.innerHTML += file.name + "<br>";
+            });
+          }
+        }
+
+        const files = document.getElementById("input-file");
+        files.addEventListener("change", (e) => {
+          preupload(e.target);
+        });
+      </script>
     </div>
   </body>
 </html>
