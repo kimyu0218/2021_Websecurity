@@ -49,7 +49,7 @@
         <div style="text-align: center">
           <h4>======== File List ========</h4>
           <div id="filelist">
-            <div style="width: 35%; float: left;">
+            <div style="width: 30%; float: left;">
               <table>
                 {% for file in files %}
                 <tr>
@@ -58,11 +58,15 @@
                 {% endfor %}
               </table>
             </div>
-            <div style="width: 50%; float: right;">
+            <div style="width: 45%; float: right;">
               <table>
                 {% for value in result %}
                 <tr>
-                  <p id="text">{{value}}</p>
+                  {% if value == 'M' %}
+                  <p id="text" style="color: red;">악성파일입니다</p>
+                  {% else %}
+                  <p id="text" style="color: black;">악성파일이 아닙니다</p>
+                  {% endif %}
                 </tr>
                 {% endfor %}
               </table>

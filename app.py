@@ -21,7 +21,7 @@ def upload_file():
         for file in files.to_dict(flat=False)['file']:
             filenames.append(file.filename)
             file.save('/var/www/html/files/'+secure_filename(file.filename))
-        
+
         os.system("""sudo ls -d /var/www/html/files/* > ~/hidost/build/tpdfs.txt &&
                     cd ~/hidost/build/ && 
                     sudo ./src/cacher -i tpdfs.txt --compact --values -c cache/ -t10 -m256 && 
@@ -89,7 +89,6 @@ def upload_file():
         predict = rfc.predict(x_test)
         print(predict)
 
-        return render_template('result.html', result=predict.tolist(), files=filenames)
-        
+        return render_template('result.html', result=predict, files=filenames)
 
 app.run(host='0.0.0.0', debug = True)
