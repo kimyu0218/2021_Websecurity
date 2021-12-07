@@ -31,7 +31,9 @@
   padding: 10px;
   outline: none;
   border: none;
-  background-color: white;
+  background-color: black;
+  color: white;
+  font-weight: bold;
   border-radius: 100%;
   cursor: pointer;
 }
