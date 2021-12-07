@@ -1,6 +1,47 @@
 <html>
   <head>
-    <link rel="stylesheet" href="./index.css" />
+    <style>
+      #container {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #label {
+        width: 200px;
+        background-color: aliceblue;
+        border: 2px solid black;
+        font-size: 20px;
+        font-weight: bold;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        cursor: pointer;
+      }
+
+      #text {
+        color: lightgray;
+        font-weight: bold;
+      }
+
+      #button {
+        width: 80px;
+        padding: 10px;
+        margin: 10px;
+        outline: none;
+        border: none;
+        background-color: black;
+        color: white;
+        font-weight: bold;
+        border-radius: 100%;
+        cursor: pointer;
+      }
+    </style>
   </head>
   <body>
     <div id="container">
@@ -8,22 +49,21 @@
         <div style="text-align: center">
           <h4>======== File List ========</h4>
           <div id="filelist">
-            <div style="width: 40%; float: left;">
+            <div style="width: 35%; float: left;">
             <table>
               {% for value in result %}
               <tr>
-                {{value}} 
+                <p id="text">{{value}}</p>
               </tr>
-              <br>
               {% endfor %}
             </table>
           </div>
-          <div style="width: 55%; float: right;">
+          <div style="width: 50%; float: right;">
           <table>
             {% for file in files %}
-            
-          <tr>{{file}} </tr>
-            <br>
+            <tr>
+              <p id="text">{{file}}</p>
+            </tr>
             {% endfor %}
             </table>
           </div>

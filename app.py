@@ -1,10 +1,6 @@
 import os
 from flask import Flask, request, render_template
 from werkzeug.utils import secure_filename
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-from sklearn.ensemble import RandomForestClassifier
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -23,8 +19,9 @@ def upload_file():
         filenames = []
         for file in files.to_dict(flat=False)['file']:
             filenames.append(file.filename)
-            file.save('/var/www/html/files/'+secure_filename(file.filename))
-        
+            file.save('/'+secure_filename(file.filename))
+        return render_template('result.html', result=filenames, files=filenames)
+        '''
         os.system("""ls -d /var/www/html/files/* > ~/hidost/build/tpdfs.txt &&
                     cd ~/hidost/build/ && 
                     ./src/cacher -i tpdfs.txt --compact --values -c cache/ -t10 -m256 && 
@@ -94,3 +91,4 @@ def upload_file():
         print("Predict: " + str(predict))
 
         return render_template('result.html', value=predict.tolist(), files=filenames)
+'''
