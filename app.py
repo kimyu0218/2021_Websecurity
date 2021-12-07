@@ -61,7 +61,7 @@ def upload_file():
             else:
                 mb = 'B'
             
-            result_string=mb+', '+str(minus_list).strip('[]')+', '+file_name
+            result_string=mb+', '+str(minus_list).strip('[]')+', '+file_name + "\n"
             output_f.write(result_string)
         input_f.close()
         output_f.close()
