@@ -50,23 +50,23 @@
           <h4>======== File List ========</h4>
           <div id="filelist">
             <div style="width: 35%; float: left;">
-            <table>
-              {% for value in result %}
-              <tr>
-                <p id="text">{{value}}</p>
-              </tr>
-              {% endfor %}
-            </table>
-          </div>
-          <div style="width: 50%; float: right;">
-          <table>
-            {% for file in files %}
-            <tr>
-              <p id="text">{{file}}</p>
-            </tr>
-            {% endfor %}
-            </table>
-          </div>
+              <table>
+                {% for file in files %}
+                <tr>
+                  <p id="text">{{file}}</p>
+                </tr>
+                {% endfor %}
+              </table>
+            </div>
+            <div style="width: 50%; float: right;">
+              <table>
+                {% for value in result %}
+                <tr>
+                  <p id="text">{{value}}</p>
+                </tr>
+                {% endfor %}
+              </table>
+            </div>
           </div>
         </div>
       </form>

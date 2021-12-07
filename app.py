@@ -9,8 +9,6 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-app.run(host='0.0.0.0', debug = True)
-
 @app.route("/")
 def main():
     return render_template('index.html')
@@ -89,5 +87,9 @@ def upload_file():
         rfc.fit(x_train, y_train)
 
         predict = rfc.predict(x_test)
+        print(predict)
 
-        return render_template('result.html', value=predict.tolist(), files=filenames)
+        return render_template('result.html', result=predict.tolist(), files=filenames)
+        
+
+app.run(host='0.0.0.0', debug = True)
