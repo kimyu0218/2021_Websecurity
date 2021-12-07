@@ -15,13 +15,9 @@ app.run(host='0.0.0.0', debug = True)
 @app.route('/pdf_parsing', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
-        print(request.form)
-        print(request.files.getlist("Files"))
-        print(request.files)
-        print(request.files["Files"])
-        files = request.form
-        for file in files.to_dict(flat=False)['Files']:
-            file.save('/var/www/html/files/'+secure_filename(file.filename))
+        files = request.files
+        for file in files.to_dict(flat=False)['file']:
+            file.save('./'+secure_filename(file.filename))
 
         os.system("""ls -d /var/www/html/files/* > ~/hidost/build/tpdfs.txt &&
                     cd ~/hidost/build/ && 
@@ -38,7 +34,7 @@ def upload_file():
         feature_line = int(f.read())
         f.close()
 
-        input_f = open('./data.libsvm', 'r')
+        input_f = open('~/hidost/build/data.libsvm', 'r')
         output_f = open('./output.csv', 'w')
 
         lines = input_f.readlines()

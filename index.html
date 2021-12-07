@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div id="container">
+      <label id="label">PDF Upload</label>
+      <form
+        action="http://127.0.0.1:5000/pdf_parsing"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <input type="file" name="file" multiple />
+        <div style="text-align: center">
+          <input type="submit" id="button" />
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
