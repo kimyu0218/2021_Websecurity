@@ -3,6 +3,7 @@ from flask import Flask, request, render_template
 from werkzeug.utils import secure_filename
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier
 from flask_cors import CORS
 
@@ -24,6 +25,7 @@ def upload_file():
 
         os.system("""sudo ls -d /var/www/html/files/* > ~/hidost/build/tpdfs.txt &&
                     cd ~/hidost/build/ && 
+                    sudo mkdir cache &&
                     sudo ./src/cacher -i tpdfs.txt --compact --values -c cache/ -t10 -m256 && 
                     sudo find cache -name '*.pdf' -not -empty > cached-tpdfs.txt &&
                     cat cached-bpdfs.txt cached-mpdfs.txt cached-tpdfs.txt > cached-pdfs.txt &&
@@ -33,7 +35,9 @@ def upload_file():
                     ./src/feat-extract -b cached_benign_test.txt -m cached-mpdfs.txt -f features.nppf --values -o data.libsvm &&
                     sudo cat features.nppf | wc -l > ~/feature_count.txt &&
                     sudo ls /var/www/html/files/* | wc -l > ~/upload_count.txt &&
-                    sudo find /var/www/html/files -name '*.pdf' -exec rm {} \;""")
+                    sudo find /var/www/html/files -name '*.pdf' -exec rm {} \; &&
+                    sudo rm -r cache
+""")
         f = open("/home/kimyujeong/feature_count.txt", "r")
         feature_line = int(f.read())
         f.close()
@@ -59,35 +63,38 @@ def upload_file():
             else:
                 mb = 'B'
             
-            result_string=mb+', '+str(minus_list).strip('[]')+', '+file_name + "\n"
+            result_string=mb+', '+str(minus_list).strip('[]')+', '+file_name+"\n"
             output_f.write(result_string)
         input_f.close()
         output_f.close()
 
         data = pd.read_csv("/home/kimyujeong/hidost/build/output.csv", header=None, error_bad_lines=False)
 
-        data = data.drop(data.columns[-1], axis=1) # 필요 없는 데이터 제거 (파일의 맨 마지막에 파일 경로 저장)
-        data_drop = data.drop(0, axis=1) # 파일 라벨 제거
-        Y = data[0] # 0번째 컬럼에 라벨 저장되어 있음
+        X = data.drop(0, axis=1)
+        Y = data[0]
 
-        datas = pd.DataFrame(data_drop.iloc[:,0:])
-        datas.columns = data_drop.iloc[:,0:].columns
-
-        X = datas.values
+        X = X.drop(X.columns[-1], axis=1)
 
         f = open("/home/kimyujeong/upload_count.txt", "r")
         upload_count = int(f.read())
         f.close()
+   
+        x = X.iloc[:-upload_count]
+        y = Y[:-upload_count]
+        test = X.iloc[-upload_count:]
 
-        x_train, x_test, y_train, y_test = train_test_split(X,Y,test_size=upload_count/len(X),random_state=0)
-        y_train = y_train.to_numpy()
-        y_test = y_test.to_numpy() 
+        x = x.to_numpy()
+        y = y.to_numpy()
+
+        x_train, x_test, y_train, y_test = train_test_split(x,y,test_size=0.1,random_state=0)
 
         rfc = RandomForestClassifier(random_state=0)
         rfc.fit(x_train, y_train)
 
-        predict = rfc.predict(x_test)
-        print(predict)
+        score = accuracy_score(y_test, rfc.predict(x_test))
+        print(score)
+
+        predict = rfc.predict(test)
 
         return render_template('result.html', result=predict, files=filenames)
 
